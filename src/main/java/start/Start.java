@@ -1,15 +1,11 @@
 package start;
 
+import database.Constants;
+import database.Database;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
 import utils.LogUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Start {
     public static void main(String[] args) {
@@ -27,23 +23,15 @@ public class Start {
                 .appName("CarAccidents")
                 .getOrCreate();
 
-        //DATE, TIME, BOROUGH, ZIP CODE, LATITUDE, LONGITUDE, LOCATION, ON STREET NAME, CROSS STREET NAME, OFF STREET NAME, NUMBER OF PERSONS INJURED, NUMBER OF PERSONS KILLED, NUMBER OF PEDESTRIANS INJURED, NUMBER OF PEDESTRIANS KILLED, NUMBER OF CYCLIST INJURED, NUMBER OF CYCLIST KILLED, NUMBER OF MOTORIST INJURED, NUMBER OF MOTORIST KILLED, CONTRIBUTING FACTOR VEHICLE 1, CONTRIBUTING FACTOR VEHICLE 2, CONTRIBUTING FACTOR VEHICLE 3, CONTRIBUTING FACTOR VEHICLE 4, CONTRIBUTING FACTOR VEHICLE 5, UNIQUE KEY, VEHICLE TYPE CODE 1, VEHICLE TYPE CODE 2, VEHICLE TYPE CODE 3, VEHICLE TYPE CODE 4,VEHICLE TYPE CODE 5
-        final List<StructField> fields = new ArrayList<>();
-        fields.add(DataTypes.createStructField("num1", DataTypes.IntegerType, false));
-        fields.add(DataTypes.createStructField("num2", DataTypes.IntegerType, true));
-        final StructType mySchema = DataTypes.createStructType(fields);
+        Database.initializeDatabase(spark);
+        Database.getDB().constructSchema();
 
-        final Dataset<Row> prova = spark
-                .read()
-                .option("header", "false")
-                .option("delimiter", ",")
-                .schema(mySchema)
-                .csv(filePath + "src/main/resources/prova.csv");
+        final Dataset<Row> prova = Database.getDB().loadData(filePath);
 
         prova.show();
 
         final Dataset<Row> query = prova
-                .select("num1");
+                .select(Constants.DATE);
 
         query.show();
 
