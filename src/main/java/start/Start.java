@@ -31,7 +31,7 @@ public class Start {
         prova.show();
 
         final Dataset<Row> query = prova
-                .select(Constants.DATE);
+                .select(Constants.DATE, Constants.BOROUGH);
 
         query.show();
 

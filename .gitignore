@@ -109,4 +109,4 @@ out/production/main/META-INF/main.kotlin_module
 *.MF
 
 #Vehicle Collisions Dataset
-/src/main/resources/NYPD_Motor_Vehicle_Collisions.csv
+/data/NYPD_Motor_Vehicle_Collisions.csv
