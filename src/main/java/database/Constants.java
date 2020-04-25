@@ -38,6 +38,10 @@ public class Constants {
     public static final String VEHICLE_TYPE_CODE_4 = "VehicleTypeCode4";
     public static final String VEHICLE_TYPE_CODE_5 = "VehicleTypeCode5";
 
+    //Added columns
+    public static final String WEEK = "Week";
+    public static final String YEAR = "Year";
+
     private Constants() {
         throw new AssertionError();
     }

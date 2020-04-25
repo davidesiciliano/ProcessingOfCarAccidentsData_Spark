@@ -7,6 +7,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import utils.LogUtils;
 
+import static org.apache.spark.sql.functions.*;
+
 public class Start {
     public static void main(String[] args) {
         LogUtils.setLogLevel();
@@ -25,15 +27,15 @@ public class Start {
 
         Database.initializeDatabase(spark);
         Database.getDB().constructSchema();
+        Database.getDB().loadDataset(filePath);
 
-        final Dataset<Row> prova = Database.getDB().loadData(filePath);
+        final Dataset<Row> dataset = Database.getDB().getDataset();
 
-        prova.show();
-
-        final Dataset<Row> query = prova
-                .select(Constants.DATE, Constants.BOROUGH);
-
-        query.show();
+        final Dataset<Row> d1 = dataset
+                .withColumn(Constants.WEEK, date_format(col(Constants.DATE), "w"))
+                .withColumn(Constants.YEAR, date_format(col(Constants.DATE), "yyyy"))
+                .select(Constants.WEEK, Constants.YEAR, Constants.BOROUGH, Constants.NUMBER_OF_PERSONS_KILLED, Constants.NUMBER_OF_PERSONS_INJURED);
+        d1.show();
 
         spark.close();
     }
