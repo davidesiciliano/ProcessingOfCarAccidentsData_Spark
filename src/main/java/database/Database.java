@@ -83,12 +83,13 @@ public class Database {
             this.dataset = spark
                     .read()
                     .option("header", "true")
-                    .option("dateFormat", "dd/MM/yyyy")
+                    .option("dateFormat", "MM/dd/yyyy")
                     .option("timestampFormat", "hh:mm")
                     .option("delimiter", ",")
                     //.option("inferSchema", "true")
                     .schema(this.mySchema)
                     .csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
+                    //.csv(filePath + "data/DatasetProva.csv");
         else
             System.err.println("Dataset already loaded");
     }

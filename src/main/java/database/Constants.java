@@ -41,6 +41,10 @@ public class Constants {
     //Added columns
     public static final String WEEK = "Week";
     public static final String YEAR = "Year";
+    public static final String NUMBER_INJURED = "NumberInjured";
+    public static final String NUMBER_KILLED = "NumberKilled";
+    public static final String NUMBER_ACCIDENTS = "NumberAccidents";
+    public static final String NUMBER_LETHAL_ACCIDENTS = "NumberLethalAccidents";
 
     private Constants() {
         throw new AssertionError();
