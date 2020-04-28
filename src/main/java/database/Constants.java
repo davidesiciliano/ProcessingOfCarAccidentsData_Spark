@@ -42,9 +42,13 @@ public class Constants {
     public static final String WEEK = "Week";
     public static final String YEAR = "Year";
     public static final String NUMBER_INJURED = "NumberInjured";
+    public static final String SUM_NUMBER_INJURED = "sum(NumberInjured)";
     public static final String NUMBER_KILLED = "NumberKilled";
+    public static final String SUM_NUMBER_KILLED = "sum(NumberKilled)";
     public static final String NUMBER_ACCIDENTS = "NumberAccidents";
     public static final String NUMBER_LETHAL_ACCIDENTS = "NumberLethalAccidents";
+    public static final String SUM_NUMBER_LETHAL_ACCIDENTS = "sum(NumberLethalAccidents)";
+    public static final String AVERAGE_NUMBER_LETHAL_ACCIDENTS = "AvgNumberLethalAccidents";
 
     private Constants() {
         throw new AssertionError();

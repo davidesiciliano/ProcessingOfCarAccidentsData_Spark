@@ -49,8 +49,7 @@ public class Start {
 
         final Dataset<Row> cleanDataset = completeDataset
                 .where(col(Constants.BOROUGH).isNotNull()
-                        .and(col(Constants.DATE).isNotNull()))
-                .cache();
+                        .and(col(Constants.DATE).isNotNull()));
 
         final Dataset<Row> d1 = cleanDataset
                 .withColumn(Constants.WEEK, weekofyear(col(Constants.DATE)))
@@ -67,24 +66,42 @@ public class Start {
                         Constants.YEAR,
                         Constants.WEEK,
                         Constants.NUMBER_INJURED,
-                        Constants.NUMBER_KILLED);
-        d1.show();
+                        Constants.NUMBER_KILLED)
+                .cache();
 
-        // --> i risultati comunque sono sbagliati rispetto alle foto
+        LocalDateTime initQuery3 = LocalDateTime.now();
+        System.out.println(">>>>>>INIT TIME QUERY 3: " + initQuery3);
+        Duration cleaningTime = Duration.between(afterReading, initQuery3);
+        System.out.println(">>>>>>EXECUTION TIME CLEANING: " + cleaningTime);
+
         final Dataset<Row> query3 = d1
                 .groupBy(Constants.BOROUGH, Constants.YEAR, Constants.WEEK)
                 .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
                         count(when(col(Constants.NUMBER_KILLED).$greater(0), true)).as(Constants.NUMBER_LETHAL_ACCIDENTS),
-                        sum(col(Constants.NUMBER_INJURED)).as("sum(NumberInjured)"),
-                        sum(col(Constants.NUMBER_KILLED)).as("sum(NumberKilled)"))
-                .withColumn("avgLethal", col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)))
+                        sum(col(Constants.NUMBER_INJURED)).as(Constants.SUM_NUMBER_INJURED),
+                        sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED))
+                .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS, col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)))
                 .sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH);
-        query3.show(100);
+        query3.show();
+
+        LocalDateTime endQuery3 = LocalDateTime.now();
+        System.out.println(">>>>>>END TIME QUERY 3: " + endQuery3);
+        Duration executionTimeQuery3 = Duration.between(initQuery3, endQuery3);
+        System.out.println(">>>>>>EXECUTION TIME QUERY 3: " + executionTimeQuery3);
+
+        final Dataset<Row> query1 = query3
+                .groupBy(Constants.YEAR, Constants.WEEK)
+                .agg(sum(col(Constants.NUMBER_LETHAL_ACCIDENTS)).as(Constants.SUM_NUMBER_LETHAL_ACCIDENTS))
+                .select(Constants.YEAR, Constants.WEEK, Constants.SUM_NUMBER_LETHAL_ACCIDENTS)
+                .sort(Constants.YEAR, Constants.WEEK);
+        query1.show();
+
+        LocalDateTime endQuery1 = LocalDateTime.now();
+        System.out.println(">>>>>>END TIME QUERY 1: " + endQuery1);
+        Duration executionTimeQuery1 = Duration.between(endQuery3, endQuery1);
+        System.out.println(">>>>>>EXECUTION TIME QUERY 1: " + executionTimeQuery1);
 
         LocalDateTime end = LocalDateTime.now();
-        System.out.println(">>>>>>END TIME: " + end);
-        Duration executionTime = Duration.between(afterReading, end);
-        System.out.println(">>>>>>EXECUTION TIME: " + executionTime);
         Duration totalTime = Duration.between(init, end);
         System.out.println(">>>>>>TOTAL TIME: " + totalTime);
 
