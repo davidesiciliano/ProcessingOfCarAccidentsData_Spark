@@ -99,21 +99,24 @@ public class Database {
                 .option("delimiter", ",")
                 //.option("inferSchema", "true")
                 .schema(this.mySchema)
-                .csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
+                //.csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
                 //.csv(filePath + "data/DatasetProva.csv");
+                .csv(filePath + "data/DatasetProvaQuery2.csv");
         this.dataset = completeDataset //clean dataset without Null values and useless columns
                 .where(col(Constants.BOROUGH).isNotNull()
                         .and(col(Constants.DATE).isNotNull()))
+                .withColumn(Constants.NUMBER_INJURED, col(Constants.NUMBER_OF_PERSONS_INJURED)
+                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_INJURED))
+                        .plus(col(Constants.NUMBER_OF_CYCLIST_INJURED))
+                        .plus(col(Constants.NUMBER_OF_MOTORIST_INJURED)))
+                .withColumn(Constants.NUMBER_KILLED, col(Constants.NUMBER_OF_PERSONS_KILLED)
+                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_KILLED))
+                        .plus(col(Constants.NUMBER_OF_CYCLIST_KILLED))
+                        .plus(col(Constants.NUMBER_OF_MOTORIST_KILLED)))
                 .select(col(Constants.DATE),
                         col(Constants.BOROUGH),
-                        col(Constants.NUMBER_OF_PERSONS_INJURED),
-                        col(Constants.NUMBER_OF_PERSONS_KILLED),
-                        col(Constants.NUMBER_OF_PEDESTRIANS_INJURED),
-                        col(Constants.NUMBER_OF_PEDESTRIANS_KILLED),
-                        col(Constants.NUMBER_OF_CYCLIST_INJURED),
-                        col(Constants.NUMBER_OF_CYCLIST_KILLED),
-                        col(Constants.NUMBER_OF_MOTORIST_INJURED),
-                        col(Constants.NUMBER_OF_MOTORIST_KILLED),
+                        col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_1),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_2),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_3),
@@ -141,7 +144,41 @@ public class Database {
 
     public Dataset<Row> executeQuery2() {
         //QUERY 2: Number of accidents and percentage of number of deaths per contributing factor in the dataset
-        return null;
+        final Dataset<Row> contributingFactor1 = this.dataset
+                .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_1).isNotNull())
+                .select(col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED),
+                        col(Constants.CONTRIBUTING_FACTOR_VEHICLE_1).as(Constants.CONTRIBUTING_FACTOR),
+                        col(Constants.UNIQUE_KEY));
+        final Dataset<Row> contributingFactor2 = this.dataset
+                .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_2).isNotNull())
+                .select(col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED),
+                        col(Constants.CONTRIBUTING_FACTOR_VEHICLE_2).as(Constants.CONTRIBUTING_FACTOR),
+                        col(Constants.UNIQUE_KEY));
+        final Dataset<Row> contributingFactor3 = this.dataset
+                .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_3).isNotNull())
+                .select(col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED),
+                        col(Constants.CONTRIBUTING_FACTOR_VEHICLE_3).as(Constants.CONTRIBUTING_FACTOR),
+                        col(Constants.UNIQUE_KEY));
+        final Dataset<Row> contributingFactor4 = this.dataset
+                .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_4).isNotNull())
+                .select(col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED),
+                        col(Constants.CONTRIBUTING_FACTOR_VEHICLE_4).as(Constants.CONTRIBUTING_FACTOR),
+                        col(Constants.UNIQUE_KEY));
+        final Dataset<Row> contributingFactor5 = this.dataset
+                .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_5).isNotNull())
+                .select(col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED),
+                        col(Constants.CONTRIBUTING_FACTOR_VEHICLE_5).as(Constants.CONTRIBUTING_FACTOR),
+                        col(Constants.UNIQUE_KEY));
+        return contributingFactor1
+                .union(contributingFactor2)
+                .union(contributingFactor3)
+                .union(contributingFactor4)
+                .union(contributingFactor5);
     }
 
     public Dataset<Row> executeQuery3() {
@@ -152,14 +189,6 @@ public class Database {
         final Dataset<Row> d1 = this.dataset
                 .withColumn(Constants.WEEK, weekofyear(col(Constants.DATE)))
                 .withColumn(Constants.YEAR, date_format(col(Constants.DATE), "yyyy"))
-                .withColumn(Constants.NUMBER_INJURED, col(Constants.NUMBER_OF_PERSONS_INJURED)
-                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_INJURED))
-                        .plus(col(Constants.NUMBER_OF_CYCLIST_INJURED))
-                        .plus(col(Constants.NUMBER_OF_MOTORIST_INJURED)))
-                .withColumn(Constants.NUMBER_KILLED, col(Constants.NUMBER_OF_PERSONS_KILLED)
-                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_KILLED))
-                        .plus(col(Constants.NUMBER_OF_CYCLIST_KILLED))
-                        .plus(col(Constants.NUMBER_OF_MOTORIST_KILLED)))
                 .select(Constants.BOROUGH,
                         Constants.YEAR,
                         Constants.WEEK,

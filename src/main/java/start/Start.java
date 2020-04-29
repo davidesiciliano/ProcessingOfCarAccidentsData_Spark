@@ -55,8 +55,8 @@ public class Start {
         Duration executionTimeQuery1 = Duration.between(endQuery3, endQuery1);
         System.out.println(">>>>>>EXECUTION TIME QUERY 1: " + executionTimeQuery1);
 
-        //final Dataset<Row> query2 = Database.getDB().executeQuery2();
-        //query2.show();
+        final Dataset<Row> query2 = Database.getDB().executeQuery2();
+        query2.show();
 
         //QUERY 2 TIME
         LocalDateTime endQuery2 = LocalDateTime.now();
