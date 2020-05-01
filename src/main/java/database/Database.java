@@ -99,9 +99,9 @@ public class Database {
                 .option("delimiter", ",")
                 //.option("inferSchema", "true")
                 .schema(this.mySchema)
-                //.csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
                 //.csv(filePath + "data/DatasetProva.csv");
-                .csv(filePath + "data/DatasetProvaQuery2.csv");
+                //.csv(filePath + "data/DatasetProvaQuery2.csv");
+                .csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
         this.dataset = completeDataset //clean dataset without Null values and useless columns
                 .where(col(Constants.BOROUGH).isNotNull()
                         .and(col(Constants.DATE).isNotNull()))
@@ -146,39 +146,55 @@ public class Database {
         //QUERY 2: Number of accidents and percentage of number of deaths per contributing factor in the dataset
         final Dataset<Row> contributingFactor1 = this.dataset
                 .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_1).isNotNull())
-                .select(col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED),
+                .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_1).as(Constants.CONTRIBUTING_FACTOR),
-                        col(Constants.UNIQUE_KEY));
+                        col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor2 = this.dataset
                 .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_2).isNotNull())
-                .select(col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED),
+                .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_2).as(Constants.CONTRIBUTING_FACTOR),
-                        col(Constants.UNIQUE_KEY));
+                        col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor3 = this.dataset
                 .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_3).isNotNull())
-                .select(col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED),
+                .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_3).as(Constants.CONTRIBUTING_FACTOR),
-                        col(Constants.UNIQUE_KEY));
+                        col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor4 = this.dataset
                 .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_4).isNotNull())
-                .select(col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED),
+                .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_4).as(Constants.CONTRIBUTING_FACTOR),
-                        col(Constants.UNIQUE_KEY));
+                        col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor5 = this.dataset
                 .where(col(Constants.CONTRIBUTING_FACTOR_VEHICLE_5).isNotNull())
-                .select(col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED),
+                .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_5).as(Constants.CONTRIBUTING_FACTOR),
-                        col(Constants.UNIQUE_KEY));
-        return contributingFactor1
+                        col(Constants.NUMBER_INJURED),
+                        col(Constants.NUMBER_KILLED));
+        final Dataset<Row> unionTable = contributingFactor1
                 .union(contributingFactor2)
                 .union(contributingFactor3)
                 .union(contributingFactor4)
-                .union(contributingFactor5);
+                .union(contributingFactor5)
+                .dropDuplicates(Constants.UNIQUE_KEY, Constants.CONTRIBUTING_FACTOR);
+                //.drop(Constants.UNIQUE_KEY); sembra che togliendolo riduca di 4 secondi
+        this.query2 = unionTable
+                .groupBy(Constants.CONTRIBUTING_FACTOR)
+                .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
+                        sum(col(Constants.NUMBER_INJURED)).as(Constants.SUM_NUMBER_INJURED),
+                        sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED))
+                .withColumn(Constants.PERCENTAGE_NUMBER_DEATHS, (col(Constants.SUM_NUMBER_KILLED)
+                        .divide(when((col(Constants.SUM_NUMBER_INJURED).plus(col(Constants.SUM_NUMBER_KILLED))).notEqual(0),
+                                col(Constants.SUM_NUMBER_INJURED).plus(col(Constants.SUM_NUMBER_KILLED)))
+                                .otherwise(1))).multiply(100))
+                .select(col(Constants.CONTRIBUTING_FACTOR),
+                        col(Constants.NUMBER_ACCIDENTS),
+                        col(Constants.PERCENTAGE_NUMBER_DEATHS));
+
+        return this.query2.orderBy(Constants.CONTRIBUTING_FACTOR);
     }
 
     public Dataset<Row> executeQuery3() {
@@ -193,8 +209,8 @@ public class Database {
                         Constants.YEAR,
                         Constants.WEEK,
                         Constants.NUMBER_INJURED,
-                        Constants.NUMBER_KILLED)
-                .cache();
+                        Constants.NUMBER_KILLED);
+                //.cache();
         this.query3 = d1
                 .groupBy(Constants.BOROUGH, Constants.YEAR, Constants.WEEK)
                 .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
@@ -202,8 +218,8 @@ public class Database {
                         sum(col(Constants.NUMBER_INJURED)).as(Constants.SUM_NUMBER_INJURED),
                         sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED))
                 .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS, col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)))
-                .sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH)
-                .cache();
+                .sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH);
+               //.cache();
 
         return this.query3;
     }

@@ -50,6 +50,7 @@ public class Constants {
     public static final String SUM_NUMBER_LETHAL_ACCIDENTS = "sum(NumberLethalAccidents)";
     public static final String AVERAGE_NUMBER_LETHAL_ACCIDENTS = "AvgNumberLethalAccidents";
     public static final String CONTRIBUTING_FACTOR = "ContributingFactor";
+    public static final String PERCENTAGE_NUMBER_DEATHS = "PercentageNumberDeaths";
 
     private Constants() {
         throw new AssertionError();
