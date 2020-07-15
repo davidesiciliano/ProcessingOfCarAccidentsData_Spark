@@ -68,6 +68,10 @@ public class Start {
         LocalDateTime end = LocalDateTime.now();
         Duration totalTime = Duration.between(init, end);
         System.out.println(">>>>>>TOTAL TIME: " + totalTime);
+        System.out.println(">>> Reading Time: " + readingTime);
+        System.out.println(">>> Execution Time Query 1: " + executionTimeQuery1);
+        System.out.println(">>> Execution Time Query 2: " + executionTimeQuery2);
+        System.out.println(">>> Execution Time Query 3: " + executionTimeQuery3);
 
         spark.close();
     }

@@ -32,3 +32,9 @@ From the Spark main folder
 From you browser
 - 127.0.0.1:8080
 - 127.0.0.1:18080 (history server)
+
+### Stop Workers
+for pid in $(jps | grep Worker | awk '{print $1}'); do kill -9 $pid; done
+
+### Start Workers
+SPARK_WORKER_INSTANCES=4 SPARK_WORKER_CORES=1 ./sbin/start-slave.sh spark://DavideS:7077
