@@ -169,6 +169,7 @@ public class Database {
                         Constants.VEHICLE_TYPE_CODE_3,
                         Constants.VEHICLE_TYPE_CODE_4)
                 .cache();
+        this.dataset.count();
     }
 
     public Dataset<Row> executeQuery1() {
@@ -300,7 +301,8 @@ public class Database {
 
         this.query3 = d2
                 .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS, col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)))
-                .sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH);
+                .sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH)
+                .cache();
 
         return this.query3;
     }
