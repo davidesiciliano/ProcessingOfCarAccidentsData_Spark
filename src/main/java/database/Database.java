@@ -143,12 +143,12 @@ public class Database {
                 .option("delimiter", ",")
                 //.option("inferSchema", "true")
                 .schema(this.mySchema)
-                //.csv(filePath + "data/DatasetProva.csv");
-                //.csv(filePath + "data/DatasetProvaQuery2.csv");
-                .csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
+                //.csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
+                .csv("wasbs:///NYPD_Motor_Vehicle_Collisions.csv"); //Azure
         this.dataset = completeDataset //clean dataset without Null values and useless columns
-                .where(col(Constants.BOROUGH).isNotNull()
-                        .and(col(Constants.DATE).isNotNull()))
+                .where(col(Constants.DATE).isNotNull())
+                .withColumn(Constants.BOROUGH, when(col(Constants.BOROUGH).isNull(), Constants.BOROUGH_NOT_SPECIFIED)
+                        .otherwise(col(Constants.BOROUGH)))
                 .withColumn(Constants.NUMBER_INJURED, col(Constants.NUMBER_OF_PERSONS_INJURED)
                         .plus(col(Constants.NUMBER_OF_PEDESTRIANS_INJURED))
                         .plus(col(Constants.NUMBER_OF_CYCLIST_INJURED))

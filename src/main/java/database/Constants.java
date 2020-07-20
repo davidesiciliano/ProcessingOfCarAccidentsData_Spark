@@ -52,6 +52,9 @@ public class Constants {
     public static final String CONTRIBUTING_FACTOR = "ContributingFactor";
     public static final String PERCENTAGE_NUMBER_DEATHS = "PercentageNumberDeaths";
 
+    //Default value
+    public static final String BOROUGH_NOT_SPECIFIED = "BOROUGH_NOT_SPECIFIED";
+
     private Constants() {
         throw new AssertionError();
     }

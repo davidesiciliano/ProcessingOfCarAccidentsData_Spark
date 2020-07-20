@@ -39,6 +39,7 @@ public class Start {
 
         final Dataset<Row> query3 = Database.getDB().executeQuery3();
         query3.show();
+        //query3.coalesce(1).write().option("header", "true").csv("./query3.csv");
 
         //QUERY 3 TIME
         LocalDateTime endQuery3 = LocalDateTime.now();
@@ -48,6 +49,7 @@ public class Start {
 
         final Dataset<Row> query1 = Database.getDB().executeQuery1();
         query1.show();
+        //query1.coalesce(1).write().option("header", "true").csv("./query1.csv");
 
         //QUERY 1 TIME
         LocalDateTime endQuery1 = LocalDateTime.now();
@@ -57,6 +59,7 @@ public class Start {
 
         final Dataset<Row> query2 = Database.getDB().executeQuery2();
         query2.show();
+        //query2.coalesce(1).write().option("header", "true").csv("./query2.csv");
 
         //QUERY 2 TIME
         LocalDateTime endQuery2 = LocalDateTime.now();
