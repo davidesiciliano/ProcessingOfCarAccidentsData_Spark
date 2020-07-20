@@ -1,0 +1,49 @@
+ContributingFactor,NumberAccidents,PercentageNumberDeaths
+Accelerator Defective,315,0.0
+Aggressive Driving/Road Rage,2456,0.49079754601227
+Alcohol Involvement,5815,0.7055405685826935
+Animals Action,361,0.0
+Backing Unsafely,22999,0.6373232423819956
+Brakes Defective,1745,0.0
+Cell Phone (hand-held),84,0.0
+Cell Phone (hands-free),172,0.0
+Driver Inattention/Distraction,91889,0.3638917262512768
+Driver Inexperience,10071,0.472204335694355
+Driverless/Runaway Vehicle,48,0.0
+Drugs (Illegal),418,1.4742014742014742
+Failure to Keep Right,1369,0.0
+Failure to Yield Right-of-Way,36056,0.547945205479452
+Fatigued/Drowsy,30033,0.014905351021016543
+Fell Asleep,1144,0.9467455621301776
+Following Too Closely,3657,1.0882238631947143
+Glare,1433,0.13003901170351106
+Headlights Defective,61,0.0
+Illness,2248,0.19474196689386564
+Lane Marking Improper/Inadequate,336,0.0
+Lost Consciousness,17682,0.2550369803621525
+Obstruction/Debris,1057,0.0
+Other Electronic Device,1929,0.423728813559322
+Other Lighting Defects,53,0.0
+Other Vehicular,26717,0.23379383634431458
+Outside Car Distraction,6826,0.1358695652173913
+Oversized Vehicle,4923,0.0
+Passenger Distraction,4481,1.373283395755306
+Passing or Lane Usage Improper,2506,0.7142857142857143
+Pavement Defective,649,0.0
+Pavement Slippery,6685,0.11530700490054771
+Pedestrian/Bicyclist/Other Pedestrian Error/Confusion,543,0.2442002442002442
+Physical Disability,8599,0.48001476968522105
+Prescription Medication,14933,0.26302811112937696
+Reaction to Other Uninvolved Vehicle,1909,0.0
+Shoulders Defective/Improper,32,0.0
+Steering Failure,594,0.0
+Tire Failure/Inadequate,431,0.0
+Tow Hitch Defective,72,12.5
+Traffic Control Device Improper/Non-Working,343,0.0
+Traffic Control Disregarded,9359,1.9963528169689988
+Turning Improperly,16504,0.21804306350504227
+Unsafe Lane Changing,1707,0.0
+Unsafe Speed,1481,0.7823613086770981
+Unspecified,587706,0.38037826309202755
+View Obstructed/Limited,3147,0.444247001332741
+Windshield Inadequate,38,0.0
