@@ -1,6 +1,7 @@
 package start;
 
 import database.Database;
+import database.DatabaseCache;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -25,52 +26,52 @@ public class Start {
                 .appName("CarAccidents")
                 .getOrCreate();
 
+        Database database = new DatabaseCache(spark);
         //INIT TIME
         LocalDateTime init = LocalDateTime.now();
-        System.out.println(">>>>>>INIT TIME: " + init);
+        System.out.println(">>>>>> INIT TIME: " + init);
 
-        Database.initializeDatabase(spark);
-        Database.getDB().loadDataset(filePath);
+        database.loadDataset(filePath);
 
         //READING TIME
         LocalDateTime afterReading = LocalDateTime.now();
         Duration readingTime = Duration.between(init, afterReading);
-        System.out.println(">>>>>>READING TIME: " + readingTime);
+        System.out.println(">>>>>> READING TIME: " + readingTime);
 
-        final Dataset<Row> query3 = Database.getDB().executeQuery3();
+        final Dataset<Row> query3 = database.executeQuery3();
         query3.show();
         //query3.coalesce(1).write().option("header", "true").csv("./query3.csv");
 
         //QUERY 3 TIME
         LocalDateTime endQuery3 = LocalDateTime.now();
-        System.out.println(">>>>>>END TIME QUERY 3: " + endQuery3);
+        System.out.println(">>>>>> END TIME QUERY 3: " + endQuery3);
         Duration executionTimeQuery3 = Duration.between(afterReading, endQuery3);
-        System.out.println(">>>>>>EXECUTION TIME QUERY 3: " + executionTimeQuery3);
+        System.out.println(">>>>>> EXECUTION TIME QUERY 3: " + executionTimeQuery3);
 
-        final Dataset<Row> query1 = Database.getDB().executeQuery1();
+        final Dataset<Row> query1 = database.executeQuery1();
         query1.show();
         //query1.coalesce(1).write().option("header", "true").csv("./query1.csv");
 
         //QUERY 1 TIME
         LocalDateTime endQuery1 = LocalDateTime.now();
-        System.out.println(">>>>>>END TIME QUERY 1: " + endQuery1);
+        System.out.println(">>>>>> END TIME QUERY 1: " + endQuery1);
         Duration executionTimeQuery1 = Duration.between(endQuery3, endQuery1);
-        System.out.println(">>>>>>EXECUTION TIME QUERY 1: " + executionTimeQuery1);
+        System.out.println(">>>>>> EXECUTION TIME QUERY 1: " + executionTimeQuery1);
 
-        final Dataset<Row> query2 = Database.getDB().executeQuery2();
+        final Dataset<Row> query2 = database.executeQuery2();
         query2.show();
         //query2.coalesce(1).write().option("header", "true").csv("./query2.csv");
 
         //QUERY 2 TIME
         LocalDateTime endQuery2 = LocalDateTime.now();
-        System.out.println(">>>>>>END TIME QUERY 2: " + endQuery2);
+        System.out.println(">>>>>> END TIME QUERY 2: " + endQuery2);
         Duration executionTimeQuery2 = Duration.between(endQuery1, endQuery2);
-        System.out.println(">>>>>>EXECUTION TIME QUERY 2: " + executionTimeQuery2);
+        System.out.println(">>>>>> EXECUTION TIME QUERY 2: " + executionTimeQuery2 + "\n");
 
         //TOTAL TIME
         LocalDateTime end = LocalDateTime.now();
         Duration totalTime = Duration.between(init, end);
-        System.out.println(">>>>>>TOTAL TIME: " + totalTime);
+        System.out.println(">>>>>> TOTAL TIME: " + totalTime);
         System.out.println(">>> Reading Time: " + readingTime);
         System.out.println(">>> Execution Time Query 1: " + executionTimeQuery1);
         System.out.println(">>> Execution Time Query 2: " + executionTimeQuery2);
