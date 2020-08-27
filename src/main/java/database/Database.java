@@ -13,6 +13,7 @@ import java.util.List;
 
 public abstract class Database {
     final SparkSession spark;
+
     StructType mySchema;
     /**
      * Contains the following columns:
