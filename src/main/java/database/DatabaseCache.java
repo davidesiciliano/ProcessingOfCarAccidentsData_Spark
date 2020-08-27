@@ -6,6 +6,7 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import utils.UnexpectedBehaviourException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class DatabaseCache implements Database {
 
     private void constructSchema() {
         if (mySchema != null)
-            System.err.println("ERRORE"); //TODO: add exception
+            throw new UnexpectedBehaviourException("Schema should not be already created");
         // DATE, TIME, BOROUGH, ZIP CODE, LATITUDE, LONGITUDE, LOCATION, ON STREET NAME,
         // CROSS STREET NAME, OFF STREET NAME, NUMBER OF PERSONS INJURED, NUMBER OF PERSONS KILLED,
         // NUMBER OF PEDESTRIANS INJURED, NUMBER OF PEDESTRIANS KILLED, NUMBER OF CYCLIST INJURED,
@@ -118,7 +119,7 @@ public class DatabaseCache implements Database {
 
     public void loadDataset(String filePath) {
         if (this.dataset != null)
-            System.err.println("Dataset already loaded");
+            throw new UnexpectedBehaviourException("Dataset already loaded");
         this.constructSchema();
         final Dataset<Row> completeDataset = spark
                 .read()
@@ -164,7 +165,6 @@ public class DatabaseCache implements Database {
     public Dataset<Row> executeQuery1() {
         //QUERY 1: Number of lethal accidents per week throughout the entire dataset
         if (this.query3 == null) {
-            System.err.println("ESEGUO QUERY 3");
             this.executeQuery3();
         }
         if (this.query1 != null)
