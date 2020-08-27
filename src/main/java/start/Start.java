@@ -2,6 +2,7 @@ package start;
 
 import database.Database;
 import database.DatabaseCache;
+import database.DatabaseNoCache;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -27,6 +28,8 @@ public class Start {
                 .getOrCreate();
 
         Database database = new DatabaseCache(spark);
+        //Database database = new DatabaseNoCache(spark);
+
         //INIT TIME
         LocalDateTime init = LocalDateTime.now();
         System.out.println(">>>>>> INIT TIME: " + init);

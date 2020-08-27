@@ -6,10 +6,11 @@ import org.apache.spark.sql.SparkSession;
 import utils.UnexpectedBehaviourException;
 
 import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.col;
 
-public class DatabaseCache extends Database {
+public class DatabaseNoCache extends Database {
 
-    public DatabaseCache(SparkSession spark) {
+    public DatabaseNoCache(SparkSession spark) {
         super(spark);
     }
 
@@ -27,9 +28,9 @@ public class DatabaseCache extends Database {
                 //.option("inferSchema", "true")
                 .schema(this.mySchema)
                 .csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
-                //.csv(filePath + "data/NYPD_Motor_Vehicle_Collisions(double).csv");
-                //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions.csv"); //Azure
-                //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions(double).csv"); //Azure
+        //.csv(filePath + "data/NYPD_Motor_Vehicle_Collisions(double).csv");
+        //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions.csv"); //Azure
+        //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions(double).csv"); //Azure
 
         this.dataset = completeDataset //clean dataset without Null values and useless columns
                 .where(col(Constants.DATE).isNotNull())
@@ -53,8 +54,7 @@ public class DatabaseCache extends Database {
                         Constants.VEHICLE_TYPE_CODE_1,
                         Constants.VEHICLE_TYPE_CODE_2,
                         Constants.VEHICLE_TYPE_CODE_3,
-                        Constants.VEHICLE_TYPE_CODE_4)
-                .cache();
+                        Constants.VEHICLE_TYPE_CODE_4);
         this.dataset.count();
     }
 
@@ -75,8 +75,7 @@ public class DatabaseCache extends Database {
                         Constants.NUMBER_LETHAL_ACCIDENTS,
                         Constants.SUM_NUMBER_INJURED,
                         Constants.SUM_NUMBER_KILLED,
-                        Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS)
-                .cache();
+                        Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS);
                 //.sort(Constants.YEAR, Constants.WEEK);
 
         return this.query1;
@@ -90,8 +89,7 @@ public class DatabaseCache extends Database {
 
         final Dataset<Row> initQuery2 = this.dataset
                 .drop(Constants.DATE,
-                        Constants.BOROUGH)
-                .cache();
+                        Constants.BOROUGH);
 
         final Dataset<Row> contributingFactor1 = initQuery2
                 .drop(Constants.CONTRIBUTING_FACTOR_VEHICLE_2,
@@ -102,8 +100,7 @@ public class DatabaseCache extends Database {
                 .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_1).as(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED))
-                .cache();
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor2 = initQuery2
                 .drop(Constants.CONTRIBUTING_FACTOR_VEHICLE_1,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_3,
@@ -113,8 +110,7 @@ public class DatabaseCache extends Database {
                 .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_2).as(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED))
-                .cache();
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor3 = initQuery2
                 .drop(Constants.CONTRIBUTING_FACTOR_VEHICLE_1,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_2,
@@ -124,8 +120,7 @@ public class DatabaseCache extends Database {
                 .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_3).as(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED))
-                .cache();
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor4 = initQuery2
                 .drop(Constants.CONTRIBUTING_FACTOR_VEHICLE_1,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_2,
@@ -135,8 +130,7 @@ public class DatabaseCache extends Database {
                 .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_4).as(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED))
-                .cache();
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> contributingFactor5 = initQuery2
                 .drop(Constants.CONTRIBUTING_FACTOR_VEHICLE_1,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_2,
@@ -146,16 +140,14 @@ public class DatabaseCache extends Database {
                 .select(col(Constants.UNIQUE_KEY),
                         col(Constants.CONTRIBUTING_FACTOR_VEHICLE_5).as(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_INJURED),
-                        col(Constants.NUMBER_KILLED))
-                .cache();
+                        col(Constants.NUMBER_KILLED));
         final Dataset<Row> unionTable = contributingFactor1
                 .union(contributingFactor2)
                 .union(contributingFactor3)
                 .union(contributingFactor4)
                 .union(contributingFactor5)
                 .dropDuplicates(Constants.UNIQUE_KEY, Constants.CONTRIBUTING_FACTOR)
-                .drop(Constants.UNIQUE_KEY)
-                .cache();
+                .drop(Constants.UNIQUE_KEY);
         this.query2 = unionTable
                 .groupBy(Constants.CONTRIBUTING_FACTOR)
                 .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
@@ -167,8 +159,7 @@ public class DatabaseCache extends Database {
                                 .otherwise(1))).multiply(100))
                 .select(col(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_ACCIDENTS),
-                        col(Constants.PERCENTAGE_NUMBER_DEATHS))
-                .cache();
+                        col(Constants.PERCENTAGE_NUMBER_DEATHS));
 
         return this.query2;
     }
@@ -187,21 +178,18 @@ public class DatabaseCache extends Database {
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_3,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_4,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_5,
-                        Constants.UNIQUE_KEY)
-                .cache();
+                        Constants.UNIQUE_KEY);
 
         final Dataset<Row> d2 = d1
                 .groupBy(Constants.BOROUGH, Constants.YEAR, Constants.WEEK)
                 .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
                         count(when(col(Constants.NUMBER_KILLED).$greater(0), true)).as(Constants.NUMBER_LETHAL_ACCIDENTS),
                         sum(col(Constants.NUMBER_INJURED)).as(Constants.SUM_NUMBER_INJURED),
-                        sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED))
-                .cache();
+                        sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED));
 
         this.query3 = d2
-                .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS, col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)))
-                //.sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH)
-                .cache();
+                .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS, col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)));
+                //.sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH);
 
         return this.query3;
     }
