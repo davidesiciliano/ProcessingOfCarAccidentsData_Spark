@@ -51,6 +51,7 @@ public class Constants {
     public static final String AVERAGE_NUMBER_LETHAL_ACCIDENTS = "AvgNumberLethalAccidents";
     public static final String CONTRIBUTING_FACTOR = "ContributingFactor";
     public static final String PERCENTAGE_NUMBER_DEATHS = "PercentageNumberDeaths";
+    public static final String PERCENTAGE_NUMBER_LETHAL_ACCIDENTS = "PercentageNumberLethalAccidents";
 
     //Default value
     public static final String BOROUGH_NOT_SPECIFIED = "BOROUGH_NOT_SPECIFIED";

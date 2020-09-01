@@ -151,15 +151,22 @@ public class DatabaseNoCache extends Database {
         this.query2 = unionTable
                 .groupBy(Constants.CONTRIBUTING_FACTOR)
                 .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
+                        count(when(col(Constants.NUMBER_KILLED).$greater(0), true)).as(Constants.NUMBER_LETHAL_ACCIDENTS),
                         sum(col(Constants.NUMBER_INJURED)).as(Constants.SUM_NUMBER_INJURED),
                         sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED))
                 .withColumn(Constants.PERCENTAGE_NUMBER_DEATHS, (col(Constants.SUM_NUMBER_KILLED)
                         .divide(when((col(Constants.SUM_NUMBER_INJURED).plus(col(Constants.SUM_NUMBER_KILLED))).notEqual(0),
                                 col(Constants.SUM_NUMBER_INJURED).plus(col(Constants.SUM_NUMBER_KILLED)))
                                 .otherwise(1))).multiply(100))
+                .withColumn(Constants.PERCENTAGE_NUMBER_LETHAL_ACCIDENTS, (col(Constants.NUMBER_LETHAL_ACCIDENTS)
+                        .divide(when((col(Constants.NUMBER_ACCIDENTS).plus(col(Constants.NUMBER_LETHAL_ACCIDENTS))).notEqual(0),
+                                col(Constants.NUMBER_ACCIDENTS).plus(col(Constants.NUMBER_LETHAL_ACCIDENTS)))
+                                .otherwise(1))).multiply(100))
                 .select(col(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_ACCIDENTS),
-                        col(Constants.PERCENTAGE_NUMBER_DEATHS));
+                        col(Constants.NUMBER_LETHAL_ACCIDENTS),
+                        col(Constants.PERCENTAGE_NUMBER_DEATHS),
+                        col(Constants.PERCENTAGE_NUMBER_LETHAL_ACCIDENTS));
 
         return this.query2;
     }
