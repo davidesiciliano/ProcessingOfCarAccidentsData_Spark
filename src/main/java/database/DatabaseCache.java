@@ -31,7 +31,9 @@ public class DatabaseCache extends Database {
                 //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions.csv"); //Azure
                 //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions(double).csv"); //Azure
 
-        this.dataset = completeDataset //clean dataset without Null values and useless columns
+        // when the borough is null it set the field to the BOROUGH_NOT_SPECIFIED constant
+        // drop all the columns not used in the queries, in order to have a smaller dataset to work on
+        this.dataset = completeDataset
                 .where(col(Constants.DATE).isNotNull())
                 .withColumn(Constants.BOROUGH, when(col(Constants.BOROUGH).isNull(), Constants.BOROUGH_NOT_SPECIFIED)
                         .otherwise(col(Constants.BOROUGH)))
@@ -44,6 +46,12 @@ public class DatabaseCache extends Database {
                         Constants.ON_STREET_NAME,
                         Constants.CROSS_STREET_NAME,
                         Constants.OFF_STREET_NAME,
+                        Constants.NUMBER_OF_PEDESTRIANS_INJURED,
+                        Constants.NUMBER_OF_PEDESTRIANS_KILLED,
+                        Constants.NUMBER_OF_CYCLIST_INJURED,
+                        Constants.NUMBER_OF_CYCLIST_KILLED,
+                        Constants.NUMBER_OF_MOTORIST_INJURED,
+                        Constants.NUMBER_OF_MOTORIST_KILLED,
                         Constants.VEHICLE_TYPE_CODE_1,
                         Constants.VEHICLE_TYPE_CODE_2,
                         Constants.VEHICLE_TYPE_CODE_3,
@@ -82,11 +90,14 @@ public class DatabaseCache extends Database {
         if (this.query2 != null)
             return this.query2;
 
+        // drop the columns not needed for the query
         final Dataset<Row> initQuery2 = this.dataset
                 .drop(Constants.DATE,
                         Constants.BOROUGH)
                 .cache();
 
+        // for each contributing factor column, if the contributing factor is not null, obtain a sub-table
+        // with the columns specified in te select clause
         final Dataset<Row> contributingFactor1 = initQuery2
                 .drop(Constants.CONTRIBUTING_FACTOR_VEHICLE_2,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_3,
@@ -142,6 +153,9 @@ public class DatabaseCache extends Database {
                         col(Constants.NUMBER_INJURED),
                         col(Constants.NUMBER_KILLED))
                 .cache();
+
+        // perform a union between the 5 sub-table obtained before, dropping every line with the same couple
+        // (uniqueKey, ContributingFactor) in order to avoid repetitions
         final Dataset<Row> unionTable = contributingFactor1
                 .union(contributingFactor2)
                 .union(contributingFactor3)
@@ -150,20 +164,24 @@ public class DatabaseCache extends Database {
                 .dropDuplicates(Constants.UNIQUE_KEY, Constants.CONTRIBUTING_FACTOR)
                 .drop(Constants.UNIQUE_KEY)
                 .cache();
+
         this.query2 = unionTable
                 .groupBy(Constants.CONTRIBUTING_FACTOR)
                 .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
                         count(when(col(Constants.NUMBER_KILLED).$greater(0), true)).as(Constants.NUMBER_LETHAL_ACCIDENTS),
                         sum(col(Constants.NUMBER_INJURED)).as(Constants.SUM_NUMBER_INJURED),
                         sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED))
+                // when we calculate the percentage we need to check that the second operand of the division is != 0
                 .withColumn(Constants.PERCENTAGE_NUMBER_DEATHS, (col(Constants.SUM_NUMBER_KILLED)
                         .divide(when((col(Constants.SUM_NUMBER_INJURED).plus(col(Constants.SUM_NUMBER_KILLED))).notEqual(0),
                                 col(Constants.SUM_NUMBER_INJURED).plus(col(Constants.SUM_NUMBER_KILLED)))
-                                .otherwise(1))).multiply(100))
+                                .otherwise(1)))
+                        .multiply(100))
                 .withColumn(Constants.PERCENTAGE_NUMBER_LETHAL_ACCIDENTS, (col(Constants.NUMBER_LETHAL_ACCIDENTS)
                         .divide(when((col(Constants.NUMBER_ACCIDENTS).plus(col(Constants.NUMBER_LETHAL_ACCIDENTS))).notEqual(0),
                                 col(Constants.NUMBER_ACCIDENTS).plus(col(Constants.NUMBER_LETHAL_ACCIDENTS)))
-                                .otherwise(1))).multiply(100))
+                                .otherwise(1)))
+                        .multiply(100))
                 .select(col(Constants.CONTRIBUTING_FACTOR),
                         col(Constants.NUMBER_ACCIDENTS),
                         col(Constants.NUMBER_LETHAL_ACCIDENTS),
@@ -182,8 +200,11 @@ public class DatabaseCache extends Database {
             return this.query3;
 
         final Dataset<Row> d1 = this.dataset
+                // weekofyear function calculates the week number starting from the date
                 .withColumn(Constants.WEEK, weekofyear(col(Constants.DATE)))
+                // date_format function retrieve the year from the date
                 .withColumn(Constants.YEAR, date_format(col(Constants.DATE), "yyyy"))
+                // drop columns not used in this query
                 .drop(Constants.CONTRIBUTING_FACTOR_VEHICLE_1,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_2,
                         Constants.CONTRIBUTING_FACTOR_VEHICLE_3,
@@ -194,14 +215,17 @@ public class DatabaseCache extends Database {
 
         final Dataset<Row> d2 = d1
                 .groupBy(Constants.BOROUGH, Constants.YEAR, Constants.WEEK)
+                // counts all the rows with the same triple (Borough, Year, Week) to calculate the number of accidents
                 .agg(count("*").as(Constants.NUMBER_ACCIDENTS),
+                        // when(col(Constants.NUMBER_KILLED).$greater(0) == true, the row is counted to increase the number of lethal accidents
                         count(when(col(Constants.NUMBER_KILLED).$greater(0), true)).as(Constants.NUMBER_LETHAL_ACCIDENTS),
                         sum(col(Constants.NUMBER_INJURED)).as(Constants.SUM_NUMBER_INJURED),
                         sum(col(Constants.NUMBER_KILLED)).as(Constants.SUM_NUMBER_KILLED))
                 .cache();
 
         this.query3 = d2
-                .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS, col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)))
+                .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS,
+                        col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)))
                 //.sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH)
                 .cache();
 

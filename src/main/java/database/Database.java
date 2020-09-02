@@ -83,7 +83,7 @@ public abstract class Database {
         // CONTRIBUTING FACTOR VEHICLE 1, CONTRIBUTING FACTOR VEHICLE 2, CONTRIBUTING FACTOR VEHICLE 3,
         // CONTRIBUTING FACTOR VEHICLE 4, CONTRIBUTING FACTOR VEHICLE 5, UNIQUE KEY, VEHICLE TYPE CODE 1,
         // VEHICLE TYPE CODE 2, VEHICLE TYPE CODE 3, VEHICLE TYPE CODE 4,VEHICLE TYPE CODE 5
-        List<StructField> fields = new ArrayList<>();
+        List<StructField> fields = new ArrayList<>(); //column name, data type to read, if the value can be null
         fields.add(DataTypes.createStructField(Constants.DATE, DataTypes.DateType, false));
         fields.add(DataTypes.createStructField(Constants.TIME, DataTypes.TimestampType, false));
         fields.add(DataTypes.createStructField(Constants.BOROUGH, DataTypes.StringType, true));

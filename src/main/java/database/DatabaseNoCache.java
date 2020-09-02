@@ -28,9 +28,9 @@ public class DatabaseNoCache extends Database {
                 //.option("inferSchema", "true")
                 .schema(this.mySchema)
                 .csv(filePath + "data/NYPD_Motor_Vehicle_Collisions.csv");
-        //.csv(filePath + "data/NYPD_Motor_Vehicle_Collisions(double).csv");
-        //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions.csv"); //Azure
-        //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions(double).csv"); //Azure
+                //.csv(filePath + "data/NYPD_Motor_Vehicle_Collisions(double).csv");
+                //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions.csv"); //Azure
+                //.csv("wasbs:///NYPD_Motor_Vehicle_Collisions(double).csv"); //Azure
 
         this.dataset = completeDataset //clean dataset without Null values and useless columns
                 .where(col(Constants.DATE).isNotNull())
@@ -45,6 +45,12 @@ public class DatabaseNoCache extends Database {
                         Constants.ON_STREET_NAME,
                         Constants.CROSS_STREET_NAME,
                         Constants.OFF_STREET_NAME,
+                        Constants.NUMBER_OF_PEDESTRIANS_INJURED,
+                        Constants.NUMBER_OF_PEDESTRIANS_KILLED,
+                        Constants.NUMBER_OF_CYCLIST_INJURED,
+                        Constants.NUMBER_OF_CYCLIST_KILLED,
+                        Constants.NUMBER_OF_MOTORIST_INJURED,
+                        Constants.NUMBER_OF_MOTORIST_KILLED,
                         Constants.VEHICLE_TYPE_CODE_1,
                         Constants.VEHICLE_TYPE_CODE_2,
                         Constants.VEHICLE_TYPE_CODE_3,
@@ -70,7 +76,6 @@ public class DatabaseNoCache extends Database {
                         Constants.SUM_NUMBER_INJURED,
                         Constants.SUM_NUMBER_KILLED,
                         Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS);
-                //.sort(Constants.YEAR, Constants.WEEK);
 
         return this.query1;
     }
@@ -190,7 +195,6 @@ public class DatabaseNoCache extends Database {
 
         this.query3 = d2
                 .withColumn(Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS, col(Constants.NUMBER_LETHAL_ACCIDENTS).divide(col(Constants.NUMBER_ACCIDENTS)));
-                //.sort(Constants.YEAR, Constants.WEEK, Constants.BOROUGH);
 
         return this.query3;
     }
