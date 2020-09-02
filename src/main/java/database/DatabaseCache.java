@@ -35,14 +35,8 @@ public class DatabaseCache extends Database {
                 .where(col(Constants.DATE).isNotNull())
                 .withColumn(Constants.BOROUGH, when(col(Constants.BOROUGH).isNull(), Constants.BOROUGH_NOT_SPECIFIED)
                         .otherwise(col(Constants.BOROUGH)))
-                .withColumn(Constants.NUMBER_INJURED, col(Constants.NUMBER_OF_PERSONS_INJURED)
-                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_INJURED))
-                        .plus(col(Constants.NUMBER_OF_CYCLIST_INJURED))
-                        .plus(col(Constants.NUMBER_OF_MOTORIST_INJURED)))
-                .withColumn(Constants.NUMBER_KILLED, col(Constants.NUMBER_OF_PERSONS_KILLED)
-                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_KILLED))
-                        .plus(col(Constants.NUMBER_OF_CYCLIST_KILLED))
-                        .plus(col(Constants.NUMBER_OF_MOTORIST_KILLED)))
+                .withColumn(Constants.NUMBER_INJURED, col(Constants.NUMBER_OF_PERSONS_INJURED))
+                .withColumn(Constants.NUMBER_KILLED, col(Constants.NUMBER_OF_PERSONS_KILLED))
                 .drop(Constants.TIME,
                         Constants.ZIPCODE,
                         Constants.LATITUDE,
@@ -76,8 +70,8 @@ public class DatabaseCache extends Database {
                         Constants.SUM_NUMBER_INJURED,
                         Constants.SUM_NUMBER_KILLED,
                         Constants.AVERAGE_NUMBER_LETHAL_ACCIDENTS)
+                //.sort(Constants.YEAR, Constants.WEEK)
                 .cache();
-                //.sort(Constants.YEAR, Constants.WEEK);
 
         return this.query1;
     }
@@ -175,7 +169,7 @@ public class DatabaseCache extends Database {
                         col(Constants.NUMBER_LETHAL_ACCIDENTS),
                         col(Constants.PERCENTAGE_NUMBER_DEATHS),
                         col(Constants.PERCENTAGE_NUMBER_LETHAL_ACCIDENTS))
-                .sort(col(Constants.CONTRIBUTING_FACTOR))
+                //.sort(col(Constants.CONTRIBUTING_FACTOR))
                 .cache();
 
         return this.query2;

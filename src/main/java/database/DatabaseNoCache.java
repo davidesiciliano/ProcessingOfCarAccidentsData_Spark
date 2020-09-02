@@ -36,14 +36,8 @@ public class DatabaseNoCache extends Database {
                 .where(col(Constants.DATE).isNotNull())
                 .withColumn(Constants.BOROUGH, when(col(Constants.BOROUGH).isNull(), Constants.BOROUGH_NOT_SPECIFIED)
                         .otherwise(col(Constants.BOROUGH)))
-                .withColumn(Constants.NUMBER_INJURED, col(Constants.NUMBER_OF_PERSONS_INJURED)
-                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_INJURED))
-                        .plus(col(Constants.NUMBER_OF_CYCLIST_INJURED))
-                        .plus(col(Constants.NUMBER_OF_MOTORIST_INJURED)))
-                .withColumn(Constants.NUMBER_KILLED, col(Constants.NUMBER_OF_PERSONS_KILLED)
-                        .plus(col(Constants.NUMBER_OF_PEDESTRIANS_KILLED))
-                        .plus(col(Constants.NUMBER_OF_CYCLIST_KILLED))
-                        .plus(col(Constants.NUMBER_OF_MOTORIST_KILLED)))
+                .withColumn(Constants.NUMBER_INJURED, col(Constants.NUMBER_OF_PERSONS_INJURED))
+                .withColumn(Constants.NUMBER_KILLED, col(Constants.NUMBER_OF_PERSONS_KILLED))
                 .drop(Constants.TIME,
                         Constants.ZIPCODE,
                         Constants.LATITUDE,
